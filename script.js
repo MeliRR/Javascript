@@ -1,86 +1,91 @@
-// Wait for the document to be fully loaded before executing any code
-document.addEventListener("DOMContentLoaded", function () {
-    const taskInput = document.getElementById("taskInput");
-    const addTaskBtn = document.getElementById("addTaskBtn");
-    const taskList = document.getElementById("taskList");
-    const clearAllBtn = document.getElementById("clearAllBtn");
-  
-    // Load tasks from localStorage if available
-    loadTasks();
-  
-    // Add new task to the list
-    addTaskBtn.addEventListener("click", function () {
-      const taskText = taskInput.value.trim();
-      if (taskText !== "") {
-        const task = {
-          text: taskText,
-          completed: false,
-        };
-        tasks.push(task);
-        saveTasks();
-        renderTasks();
-        taskInput.value = ""; // Clear input field
-      } else {
-        alert("Please enter a task!");
-      }
-    });
-  
-    // Clear all tasks
-    clearAllBtn.addEventListener("click", function () {
-      if (confirm("Are you sure you want to clear all tasks?")) {
-        tasks = [];
-        saveTasks();
-        renderTasks();
-      }
-    });
-  
-    // Delete a task
-    taskList.addEventListener("click", function (event) {
-      if (event.target.classList.contains("deleteBtn")) {
-        const index = event.target.dataset.index;
-        tasks.splice(index, 1); // Remove task from array
-        saveTasks();
-        renderTasks();
-      }
-    });
-  
-    // Render all tasks to the list
-    function renderTasks() {
-      taskList.innerHTML = ""; // Clear the list before rendering
-      tasks.forEach((task, index) => {
-        const li = document.createElement("li");
-        li.innerHTML = `
-          <span class="${task.completed ? "completed" : ""}">${task.text}</span>
-          <button class="deleteBtn" data-index="${index}">Delete</button>
-        `;
-        taskList.appendChild(li);
-      });
+let tasks = [];
+
+// DOM elements
+const taskListElement = document.getElementById("task-list");
+const taskFormElement = document.getElementById("task-form");
+const taskDescInput = document.getElementById("task-desc");
+const taskPriorityInput = document.getElementById("task-priority");
+
+document.getElementById("add-task-btn").addEventListener("click", showAddTaskForm);
+document.getElementById("view-tasks-btn").addEventListener("click", viewTasks);
+document.getElementById("remove-task-btn").addEventListener("click", removeTask);
+document.getElementById("edit-task-btn").addEventListener("click", editTask);
+document.getElementById("save-btn").addEventListener("click", saveTasks);
+document.getElementById("exit-btn").addEventListener("click", exitApp);
+
+document.getElementById("submit-task").addEventListener("click", addTask);
+document.getElementById("cancel-task").addEventListener("click", hideTaskForm);
+
+function showAddTaskForm() {
+    taskFormElement.style.display = "block";
+}
+
+function hideTaskForm() {
+    taskFormElement.style.display = "none";
+    clearTaskForm();
+}
+
+function clearTaskForm() {
+    taskDescInput.value = "";
+    taskPriorityInput.value = "";
+}
+
+function addTask() {
+    const description = taskDescInput.value.trim();
+    const priority = taskPriorityInput.value.trim().toLowerCase();
+
+    if (description && priority) {
+        tasks.push({ description, priority });
+        console.log(`Task added: ${description} with priority ${priority}`);
+        hideTaskForm();
+        viewTasks();
+    } else {
+        alert("Please fill in both description and priority.");
     }
-  
-    // Save tasks to localStorage
-    function saveTasks() {
-      localStorage.setItem("tasks", JSON.stringify(tasks));
+}
+
+function viewTasks() {
+    if (tasks.length === 0) {
+        taskListElement.innerHTML = "<p>No tasks to display.</p>";
+    } else {
+        taskListElement.innerHTML = "";
+        tasks.forEach((task, index) => {
+            taskListElement.innerHTML += `
+                <div class="task">
+                    <span>[${task.priority}] ${task.description}</span>
+                    <button onclick="removeTask(${index})">Remove</button>
+                    <button onclick="editTask(${index})">Edit</button>
+                </div>
+            `;
+        });
     }
-  
-    // Load tasks from localStorage
-    function loadTasks() {
-      const savedTasks = localStorage.getItem("tasks");
-      if (savedTasks) {
-        tasks = JSON.parse(savedTasks);
-        renderTasks();
-      }
-    }
-  
-    // Mark a task as completed (click to toggle)
-    taskList.addEventListener("click", function (event) {
-      if (event.target.tagName === "SPAN") {
-        const index = Array.from(taskList.children).indexOf(event.target.parentElement);
-        tasks[index].completed = !tasks[index].completed;
-        saveTasks();
-        renderTasks();
-      }
-    });
-  
-    // Initial empty task array
-    let tasks = [];
-  });
+}
+
+function removeTask(index) {
+    tasks.splice(index, 1);
+    viewTasks();
+}
+
+function editTask(index) {
+    const task = tasks[index];
+    taskDescInput.value = task.description;
+    taskPriorityInput.value = task.priority;
+    taskFormElement.style.display = "block";
+    document.getElementById("submit-task").onclick = () => updateTask(index);
+}
+
+function updateTask(index) {
+    tasks[index].description = taskDescInput.value.trim();
+    tasks[index].priority = taskPriorityInput.value.trim().toLowerCase();
+    hideTaskForm();
+    viewTasks();
+}
+
+function saveTasks() {
+    localStorage.setItem("tasks", JSON.stringify(tasks));
+    alert("Tasks saved successfully!");
+}
+
+function exitApp() {
+    window.close();
+}

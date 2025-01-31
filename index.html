@@ -4,23 +4,33 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>To-Do List Application</title>
+    <title>To-Do List App</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 
 <body>
     <div class="container">
-        <h1>My To-Do List</h1>
-        <input type="text" id="taskInput" placeholder="Enter a new task" />
-        <button id="addTaskBtn">Add Task</button>
+        <h1>To-Do List Application</h1>
 
-        <h2>Tasks</h2>
-        <ul id="taskList"></ul>
+        <div class="menu">
+            <button id="add-task-btn">Add Task</button>
+            <button id="view-tasks-btn">View Tasks</button>
+            <button id="remove-task-btn">Remove Task</button>
+            <button id="edit-task-btn">Edit Task</button>
+            <button id="save-btn">Save Tasks</button>
+            <button id="exit-btn">Exit</button>
+        </div>
 
-        <button id="clearAllBtn">Clear All Tasks</button>
+        <div id="task-list" class="task-list"></div>
+        <div id="task-form" class="task-form" style="display: none;">
+            <input type="text" id="task-desc" placeholder="Enter task description" />
+            <input type="text" id="task-priority" placeholder="Enter task priority (low, medium, high)" />
+            <button id="submit-task">Submit</button>
+            <button id="cancel-task">Cancel</button>
+        </div>
     </div>
 
-    <script src="script.js"></script>
+    <script src="app.js"></script>
 </body>
 
 </html>
